@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/security
+	http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="org.postgresql.Driver" />
+		<property name="url"
+			value="jdbc:postgresql://postgres23872-otlichnosti.jelastic.regruhosting.ru/rightnabove" />
+		<property name="username" value="rightnabove" />
+		<property name="password" value="rightnabove" />
+	</bean>
+
+	<bean id="employeeDao" class="com.semenov.rightnabove.test.dao.EmployeeDAO">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="employeeValidator"
+		class="com.semenov.rightnabove.test.validator.EmployeeValidator" />
+
+	<bean id="departmentDao" class="com.semenov.rightnabove.test.dao.DepartmentDAO">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="departmentValidator"
+		class="com.semenov.rightnabove.test.validator.DepartmentValidator" />
+
+	<bean id="freemarkerConfig"
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
+		<property name="templateLoaderPath" value="/WEB-INF/ftl/" />
+	</bean>
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
+		<property name="cache" value="true" />
+		<property name="prefix" value="" />
+		<property name="suffix" value=".ftl" />
+	</bean>
+
+	<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basename" value="classpath:messages" />
+		<property name="defaultEncoding" value="UTF-8" />
+		<property name="fileEncodings" value="UTF-8" />
+	</bean>
+
+	<bean id="localeChangeInterceptor"
+		class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+		<property name="paramName" value="lang" />
+	</bean>
+
+	<bean id="localeResolver"
+		class="org.springframework.web.servlet.i18n.CookieLocaleResolver">
+		<property name="defaultLocale" value="en" />
+	</bean>
+
+	<context:component-scan base-package="com.semenov.rightnabove.test.controller" />
+
+	<security:http auto-config="true">
+		<security:intercept-url pattern="/pages/*" access="ROLE_VIEWER, ROLE_EDITOR" />
+		<security:intercept-url pattern="/pages/view/" access="ROLE_VIEWER, ROLE_EDITOR" />
+		<security:intercept-url pattern="/pages/edit/*" access="ROLE_EDITOR" />
+		<security:intercept-url pattern="/pages/save/*" access="ROLE_EDITOR" />
+		<security:intercept-url pattern="/pages/delete/*" access="ROLE_EDITOR" />
+	</security:http>
+
+	<security:authentication-manager>
+		<security:authentication-provider>
+			<security:user-service>
+				<security:user name="viewer" password="viewer"
+					authorities="ROLE_VIEWER" />
+				<security:user name="editor" password="editor"
+					authorities="ROLE_EDITOR" />
+			</security:user-service>
+		</security:authentication-provider>
+	</security:authentication-manager>
+</beans>
