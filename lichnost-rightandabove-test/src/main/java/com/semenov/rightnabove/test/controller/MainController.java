@@ -14,8 +14,6 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.context.MessageSource;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.TypeDescriptor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -26,12 +24,14 @@ import org.springframework.validation.ObjectError;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.semenov.rightnabove.test.dao.DepartmentDAO;
 import com.semenov.rightnabove.test.dao.EmployeeDAO;
@@ -86,7 +86,8 @@ public class MainController {
 		if (binder.getTarget() instanceof Employee) {
 			binder.setValidator(employeeValidator);
 			SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-			binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
+			binder.registerCustomEditor(Date.class, new CustomDateEditor(
+					dateFormat, true));
 		}
 	}
 
@@ -130,35 +131,44 @@ public class MainController {
 								new String[] {}, locale)));
 			}
 		}
-		if (!StringUtils.isEmpty(active)) {
-			active = Boolean.parseBoolean(activeStr);
+		if (!StringUtils.isEmpty(activeStr)) {
+			active = "on".equalsIgnoreCase(activeStr);
 		}
 
 		Map<String, Object> searchParameters = new HashMap<String, Object>();
+		Map<String, Object> returnParameters = new HashMap<String, Object>();
 		if (!StringUtils.isEmpty(firstName)) {
 			searchParameters.put("firstName", firstName.replace("*", "%")
 					.replace("?", "_"));
+			returnParameters.put("firstName", firstName);
 		}
 		if (!StringUtils.isEmpty(lastName)) {
 			searchParameters.put("lastName", lastName.replace("*", "%")
 					.replace("?", "_"));
+			returnParameters.put("lastName", lastName);
 		}
 		if (!StringUtils.isEmpty(departmentName)) {
 			searchParameters.put("departmentName",
 					departmentName.replace("*", "%").replace("?", "_"));
+			returnParameters.put("departmentName",
+					departmentName);
 		}
 		if (salary != null) {
 			searchParameters.put("salary", salary);
+			returnParameters.put("salary", salary);
 		}
 		if (birthdate != null) {
 			searchParameters.put("birthdate", birthdate);
+			returnParameters.put("birthdate", birthdate);
 		}
 		if (active != null) {
 			searchParameters.put("active", active);
+			returnParameters.put("active", active);
 		}
-		model.addAllAttributes(searchParameters);
-
+		
 		List<Employee> list = employeeDao.search(searchParameters);
+		
+		model.addAllAttributes(returnParameters);
 		model.addAttribute("employees", list);
 
 		return "/pages/employees";
@@ -186,8 +196,8 @@ public class MainController {
 
 	@RequestMapping(value = "/pages/save/employee", method = RequestMethod.POST)
 	public String saveEmployee(@ModelAttribute("model") ModelMap model,
-			@ModelAttribute("employee") @Validated Employee employee,
-			BindingResult bindingResult, Locale locale) {
+			BindingResult bindingResult, Locale locale,
+			@ModelAttribute("employee") @Validated Employee employee) {
 		boolean viewOnly = !isEditor();
 		model.addAttribute("viewOnly", viewOnly);
 
@@ -212,8 +222,8 @@ public class MainController {
 
 	@RequestMapping(value = "/pages/delete/employee", method = RequestMethod.GET)
 	public String deleteEmployee(@ModelAttribute("model") ModelMap model,
-			@RequestParam(value = "id") Long id, BindingResult bindingResult,
-			Locale locale) {
+			BindingResult bindingResult, Locale locale,
+			@RequestParam(value = "id") Long id) {
 		if (id != null) {
 			employeeDao.deleteById(id);
 		}
@@ -243,7 +253,7 @@ public class MainController {
 	public String actionDepartment(@PathVariable("action") String action,
 			@ModelAttribute("model") ModelMap model,
 			BindingResult bindingResult, Locale locale,
-			@RequestParam(value = "id", required = false) String id) {
+			@RequestParam(value = "id", required = false) Long id) {
 		boolean viewOnly = !isEditor() || "view".equals(action);
 		model.addAttribute("viewOnly", viewOnly);
 
@@ -251,7 +261,7 @@ public class MainController {
 			return "/pages/edit-department";
 		}
 
-		Department department = departmentDao.getById(Long.valueOf(id));
+		Department department = departmentDao.getById(id);
 		model.addAttribute("department", department);
 		return "/pages/edit-department";
 	}
@@ -282,13 +292,21 @@ public class MainController {
 
 	@RequestMapping(value = "/pages/delete/department", method = RequestMethod.GET)
 	public String deleteDepartment(@ModelAttribute("model") ModelMap model,
-			@RequestParam(value = "id") Long id, BindingResult bindingResult,
-			Locale locale) {
+			BindingResult bindingResult, Locale locale,
+			@RequestParam(value = "id") Long id) {
 		if (id != null) {
 			departmentDao.deleteById(id);
 		}
 		// TODO слелать сообщение о результате выполнения
 		return "redirect:/pages/departments.html";
+	}
+
+	// TODO надо разделить исключения по типам
+	@ExceptionHandler({ Exception.class })
+	private ModelAndView exceptionHandler(Exception exception) {
+		ModelAndView model = new ModelAndView("pages/exception");
+		model.addObject("exception", exception.getMessage());
+		return model;
 	}
 
 }

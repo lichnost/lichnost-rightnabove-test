@@ -1,7 +1,6 @@
 package com.semenov.rightnabove.test.validator;
 
 import java.math.BigDecimal;
-import java.util.Calendar;
 import java.util.Date;
 
 import org.springframework.validation.Errors;
@@ -34,15 +33,15 @@ public class EmployeeValidator implements Validator {
 			}
 		}
 		if (errors.getFieldError("birthdate") == null) {
+
 			Date birthdate = employee.getBirthdate();
 			if (birthdate == null) {
 				errors.rejectValue("birthdate",
 						"errors.field.empty-or-whitespace");
 			} else {
-				Calendar calendar = Calendar.getInstance();
-				calendar.set(1900, 0, 1);
-				if (!(calendar.before(birthdate) && (new Date())
-						.before(birthdate))) {
+				Date now = new Date();
+				Date begin = new Date(0, 0, 1);
+				if (!(birthdate.after(begin) && birthdate.before(now))) {
 					errors.rejectValue("birthdate",
 							"errors.field.birthdate-constraint");
 				}

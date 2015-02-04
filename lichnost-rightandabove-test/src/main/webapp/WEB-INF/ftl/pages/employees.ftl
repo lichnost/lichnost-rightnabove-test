@@ -61,7 +61,7 @@
         		<td><input name="birthdate" class="width-100" type="text" placeholder="dd.mm.yyyy"
         			<#if model.birthdate??>value="${model.birthdate?string["dd.MM.yyyy"]}"</#if>></td>
         		<td><input name="active" class="width-100" type="checkbox" placeholder="<@spring.message "employee.active"/>" 
-        			<#if model.active??>value="${model.active?c}"</#if>></td>
+        			<#if model.active??>checked value="${model.active?c}"</#if>></td>
 				<td colspan="2"><input type="submit" class="btn btn-small width-100" value="<@spring.message "table.search"/>"></td>
 				<td><a href="/pages/employees.html" class="btn btn-small width-100"><@spring.message "table.search-clear"/></td>
 			</tr>
@@ -73,7 +73,7 @@
 				<td>${empl.departmentName}</td>
         		<td>${empl.salary}</td>	
         		<td>${empl.birthdate?string["dd.MM.yyyy"]}</td>
-        		<td><input type="checkbox" disabled="disabled" <#if empl.active>checked</#if>></td>	
+        		<td><input type="checkbox" disabled="disabled" <#if empl.active>checked value="true"</#if>></td>	
         		<td><a class="btn btn-smaller btn-blue width-100" href="./view/employee.html?id=${empl.id}"><@spring.message "table.view"/></a></td>
         		<td>
         			<#if !model.viewOnly>

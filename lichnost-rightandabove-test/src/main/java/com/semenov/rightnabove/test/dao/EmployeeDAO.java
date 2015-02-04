@@ -121,7 +121,7 @@ public class EmployeeDAO implements AbstractDAO<Employee> {
 			args.add(parameters.get("firstName"));
 		}
 		if (parameters.containsKey("lastName")) {
-			sql.append("AND e.lastName LIKE ? ");
+			sql.append("AND e.last_name LIKE ? ");
 			args.add(parameters.get("lastName"));
 		}
 		if (parameters.containsKey("departmentName")) {
