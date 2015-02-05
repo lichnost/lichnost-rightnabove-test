@@ -20,21 +20,6 @@
 		<spring.version>4.1.4.RELEASE</spring.version>
 	</properties>
 
-	<profiles>
-		<profile>
-			<id>production</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<jdbc.class>org.postgresql.Driver</jdbc.class>
-				<jdbc.url>jdbc:postgresql://postgres23872-otlichnosti.jelastic.regruhosting.ru/rightnabove</jdbc.url>
-				<jdbc.user>rightnabove</jdbc.user>
-				<jdbc.password>rightnabove</jdbc.password>
-			</properties>
-		</profile>
-	</profiles>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -106,6 +91,24 @@
 			<artifactId>joda-time</artifactId>
 			<version>2.7</version>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>4.1.4.RELEASE</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>ru.yandex.qatools.embed</groupId>
+			<artifactId>postgresql-embedded</artifactId>
+			<version>1.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -140,7 +143,7 @@
 				<configuration>
 					<email>${jelastic.lichnost.account.email}</email>
 					<password>${jelastic.lichnost.account.password}</password>
-					<context>rigthandamove-test</context>
+					<context>rightandabove-test</context>
 					<environment>otlichnosti</environment>
 					<comment>Right and Above Test</comment>
 					<api_hoster>${jelastic.lichnost.account.api_hoster}</api_hoster>

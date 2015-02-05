@@ -43,7 +43,7 @@
         		<td><input name="name" class="width-100" type="text" placeholder="<@spring.message "department.name"/>" 
         			<#if model.name??>value="${model.name}"</#if>></td>
 				<td colspan="2"><input type="submit" class="btn btn-small width-100" value="<@spring.message "table.search"/>"></td>
-				<td><a href="/pages/departments.html" class="btn btn-small width-100"><@spring.message "table.search-clear"/></td>
+				<td><a href="./departments.html" class="btn btn-small width-100"><@spring.message "table.search-clear"/></td>
 			</tr>
 		</form>
     	<#list model["departments"] as depart>

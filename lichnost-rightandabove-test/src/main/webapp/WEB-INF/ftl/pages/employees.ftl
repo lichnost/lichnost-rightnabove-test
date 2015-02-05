@@ -63,7 +63,7 @@
         		<td><input name="active" class="width-100" type="checkbox" placeholder="<@spring.message "employee.active"/>" 
         			<#if model.active??>checked value="${model.active?c}"</#if>></td>
 				<td colspan="2"><input type="submit" class="btn btn-small width-100" value="<@spring.message "table.search"/>"></td>
-				<td><a href="/pages/employees.html" class="btn btn-small width-100"><@spring.message "table.search-clear"/></td>
+				<td><a href="./employees.html" class="btn btn-small width-100"><@spring.message "table.search-clear"/></td>
 			</tr>
 		</form>
     	<#list model["employees"] as empl>
